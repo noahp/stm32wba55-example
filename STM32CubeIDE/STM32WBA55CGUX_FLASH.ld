@@ -78,6 +78,13 @@ SECTIONS
     _etext = .;        /* define a global symbols at end of code */
   } >FLASH
 
+  /* save a unique build identifier in the firmware, https://mflt.io/gnu-build-id */
+  .note.gnu.build-id :
+  {
+        __start_gnu_build_id_start = .;
+        KEEP(*(.note.gnu.build-id))
+  } > FLASH
+
   /* Constant data into "FLASH" Rom type memory */
   .rodata :
   {

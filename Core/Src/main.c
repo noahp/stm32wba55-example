@@ -22,6 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "memfault/components.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -115,6 +117,9 @@ int main(void)
 
   /* Init code for STM32_WPAN */
   MX_APPE_Init(NULL);
+
+  /* Init memfault subsystem */
+  memfault_platform_boot();
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */

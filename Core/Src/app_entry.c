@@ -345,9 +345,6 @@ static void Config_HSE(void)
  */
 static void System_Init( void )
 {
-  /* Clear RCC RESET flag */
-  LL_RCC_ClearResetFlags();
-
   UTIL_TIMER_Init();
 
   /* Enable wakeup out of standby from RTC ( UTIL_TIMER )*/

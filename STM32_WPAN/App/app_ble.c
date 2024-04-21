@@ -35,6 +35,9 @@
 #include "simple_nvm_arbiter.h"
 #include "p2p_server.h"
 #include "p2p_server_app.h"
+#include "memfault/components.h"
+#include "memfault/ports/ble/mds.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stm32wbaxx_nucleo.h"
@@ -298,6 +301,7 @@ void APP_BLE_Init(void)
     LOG_INFO_APP("\n");
     LOG_INFO_APP("Services and Characteristics creation\n");
     P2P_SERVER_APP_Init();
+    mds_boot();
     LOG_INFO_APP("End of Services and Characteristics creation\n");
     LOG_INFO_APP("\n");
 
@@ -328,6 +332,21 @@ void APP_BLE_Init(void)
   return;
 }
 
+void memfault_metrics_heartbeat_collect_data(void) {
+  if (bleAppContext.BleApplicationContext_legacy.connectionHandle == 0) {
+    return;
+  }
+
+  uint8_t rssi = 0;
+  tBleStatus rv = hci_read_rssi(bleAppContext.BleApplicationContext_legacy.connectionHandle, &rssi);
+  if (rv != BLE_STATUS_SUCCESS) {
+    return;
+  }
+
+  MEMFAULT_METRIC_SET_SIGNED(ble_rssi, (int8_t)rssi);
+  MEMFAULT_METRIC_ADD(ble_disconnect_count, 0);
+}
+
 SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
 {
   tBleStatus ret = BLE_STATUS_ERROR;
@@ -345,6 +364,8 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
   {
     case HCI_DISCONNECTION_COMPLETE_EVT_CODE:
     {
+      MEMFAULT_METRIC_TIMER_STOP(ble_connected_time_ms);
+      MEMFAULT_METRIC_ADD(ble_disconnect_count, 1);
       hci_disconnection_complete_event_rp0 *p_disconnection_complete_event;
       p_disconnection_complete_event = (hci_disconnection_complete_event_rp0 *) p_event_pckt->data;
       if (p_disconnection_complete_event->Connection_Handle == bleAppContext.BleApplicationContext_legacy.connectionHandle)
@@ -477,6 +498,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
                       p_conn_complete->Conn_Latency,
                       p_conn_complete->Supervision_Timeout * 10
                      );
+          MEMFAULT_METRIC_TIMER_START(ble_connected_time_ms);
 
           if (bleAppContext.Device_Connection_Status == APP_BLE_LP_CONNECTING)
           {
@@ -1589,6 +1611,7 @@ void APPE_Button2Action(void)
 
 void APPE_Button3Action(void)
 {
+  MEMFAULT_ASSERT(0);
   if (bleAppContext.Device_Connection_Status != APP_BLE_CONNECTED_SERVER)
   {
 
