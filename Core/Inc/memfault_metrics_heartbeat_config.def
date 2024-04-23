@@ -1,0 +1,5 @@
+//! Define custom system metrics to track. For example,
+
+MEMFAULT_METRICS_KEY_DEFINE(ble_disconnect_count, kMemfaultMetricType_Unsigned)
+MEMFAULT_METRICS_KEY_DEFINE(ble_connected_time_ms, kMemfaultMetricType_Timer)
+MEMFAULT_METRICS_KEY_DEFINE(ble_rssi, kMemfaultMetricType_Signed)
