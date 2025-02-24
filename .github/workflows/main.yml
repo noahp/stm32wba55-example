@@ -19,7 +19,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/noahp/stm32wba55-example:2024-08-01
+      image: ghcr.io/noahp/stm32wba55-example:2025-02-24
 
     steps:
       - name: Checkout code
@@ -30,12 +30,12 @@ jobs:
 
       - name: Build project
         run: |
-          /opt/st/stm32cubeide_1.16.0/stm32cubeide --launcher.suppressErrors -nosplash \
+          /opt/st/stm32cubeide_1.17.0/stm32cubeide --launcher.suppressErrors -nosplash \
             -application org.eclipse.cdt.managedbuilder.core.headlessbuild \
             -data /tmp/stm-workspace \
             -import "STM32CubeIDE"
 
-          /opt/st/stm32cubeide_1.16.0/stm32cubeide --launcher.suppressErrors -nosplash \
+          /opt/st/stm32cubeide_1.17.0/stm32cubeide --launcher.suppressErrors -nosplash \
             -application org.eclipse.cdt.managedbuilder.core.headlessbuild \
             -data /tmp/stm-workspace \
             -build BLE_p2pServer/Debug
